@@ -5,6 +5,6 @@
 
 int decodeBMP(BMP_FILE *bmp_file, char *image_name);
 
-int writeToBMP(char *name, Pixel *image_data);
+int writeToBMP(BMP_FILE *bmp_file, char *file_name);
 
 #endif

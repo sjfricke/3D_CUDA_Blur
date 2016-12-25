@@ -4,14 +4,13 @@
 
 int decodeBMP(BMP_FILE *bmp_file, char* image_name){
 
-  int char_buf;
   int offset;
   int pixel_count;
   unsigned char pixel_buffer[3];
   Pixel pixel;
   char pad_buf[4]; //TODO fread to empty pointer
   int i = 0;
-
+  
   bmp_file->file_pointer = fopen(image_name, "r");
   if (bmp_file->file_pointer == NULL) {
     fprintf(stderr, "Can't open file");
@@ -54,16 +53,18 @@ int decodeBMP(BMP_FILE *bmp_file, char* image_name){
    pixel.red = pixel_buffer[0];
    pixel.green = pixel_buffer[1];
    pixel.blue = pixel_buffer[2]; 
-   
-
+     
    *(bmp_file->image_data + pixel_count) = pixel;
    pixel_count++;
-   
-   if (offset == bmp_file->width && bmp_file->padding_count > 0) {
+
+   //will skip alignment offset
+   if (offset == (bmp_file->width-1) && bmp_file->padding_count > 0) {
      fread(pad_buf, 1, bmp_file->padding_count, bmp_file->file_pointer);
      //reads off 4-byte align offset
+     offset = 0;
+   } else {
+     offset++;
    }
-
    
   }//while loop
 
@@ -73,7 +74,37 @@ int decodeBMP(BMP_FILE *bmp_file, char* image_name){
  return 0;
 }
 
-int writeToBMP(char *name, Pixel *image_data){
-  printf("TODO\n");
+int writeToBMP(BMP_FILE *bmp_file, char* file_name){
+
+  FILE *out_file;
+  int offset, i;
+  char *padding;
+  
+  out_file = fopen(file_name, "wb");
+  if (out_file == NULL) {
+    fprintf(stderr, "Can't open write file");
+    return -1;
+  }
+
+  //sets up padding for file, padding can be what ever
+  padding = (char *) malloc(sizeof(char) * bmp_file->padding_count);
+  
+  fwrite( bmp_file->header, sizeof(bmp_file->header), 1, out_file); //writes back header
+
+  offset = 0;
+  for(i = 0; i < bmp_file->width * bmp_file->height; i++){
+
+    fwrite((bmp_file->image_data + i), 3, 1,  out_file );
+
+    if (offset == (bmp_file->width-1) && bmp_file->padding_count > 0) {
+      fwrite(padding, (int)bmp_file->padding_count, 1, out_file);
+      offset = 0;
+    } else {
+      offset++;
+    }
+  
+  }
+
+  fclose(out_file);
   return 0;
 }
