@@ -13,7 +13,7 @@ int decodeBMP(BMP_FILE *bmp_file, char* image_name){
   
   bmp_file->file_pointer = fopen(image_name, "r");
   if (bmp_file->file_pointer == NULL) {
-    fprintf(stderr, "Can't open file");
+    fprintf(stderr, "Can't open file\n");
     exit(1);
   }
 
@@ -28,13 +28,14 @@ int decodeBMP(BMP_FILE *bmp_file, char* image_name){
   }
 
   //gather dimension details
-  bmp_file->width = (int)bmp_file->header[18];
-  bmp_file->height = (int)bmp_file->header[22];
+  bmp_file->width = *(int*)(&bmp_file->header[18]);
+  bmp_file->height = *(int*)(&bmp_file->header[22]);
+
   printf("Width: %d\nHeight: %d\n", bmp_file->width, bmp_file->height);
 
   //bmp files have padding to be 4-byte word aligned
   //save paddig value 0-3 in single byte in struct
-  bmp_file->padding_count = 4- ((bmp_file->width * 3) % 4);
+  bmp_file->padding_count = (4 - ((bmp_file->width * 3) % 4) ) % 4;
   printf("padding: %d\n", (int)bmp_file->padding_count);
 
   //finds out how much image data there is
@@ -50,10 +51,11 @@ int decodeBMP(BMP_FILE *bmp_file, char* image_name){
   pixel_count = 0;
   while ( fread(pixel_buffer, 1, 3, bmp_file->file_pointer) == 3) {
 
-   pixel.red = pixel_buffer[0];
+    //reads a little endian 3 byte value
+   pixel.red = pixel_buffer[2];
    pixel.green = pixel_buffer[1];
-   pixel.blue = pixel_buffer[2]; 
-     
+   pixel.blue = pixel_buffer[0]; 
+
    *(bmp_file->image_data + pixel_count) = pixel;
    pixel_count++;
 

@@ -43,9 +43,9 @@ int main(int argc, char* argv[]){
   for(i = 0; i < bmp_file->height * bmp_file->width; i++){
     if(isWhite((Pixel) *(bmp_file->image_data + i)) != 0) {
       
-      printf("Before: %6X\t ", *(bmp_file->image_data + i));  
-      (*(bmp_file->image_data + i)).red = 0xFF;
-      printf("After: %6X\n ", *(bmp_file->image_data + i));
+      //      printf("Before: %6X\t ", *(bmp_file->image_data + i));
+      (*(bmp_file->image_data + i)).red = 0x00;
+      //printf("After: %6X\n ", *(bmp_file->image_data + i));
 
     }
   }
