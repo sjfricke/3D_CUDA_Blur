@@ -1,7 +1,7 @@
 CC=gcc
 
-main: image_util.o bmp_decoder.o bitmap_cuda.o
-	$(CC) -o bitmap_cuda image_util.o bmp_decoder.o bitmap_cuda.o
+main: image_util.o bmp_decoder.o bitmap_main.o
+	$(CC) -o bitmap image_util.o bmp_decoder.o bitmap_main.o
 
 clean:
-	rm bitmap_cuda image_util.o bmp_decoder.o bitmap_cuda.o
+	rm bitmap image_util.o bmp_decoder.o bitmap_main.o
